@@ -26,11 +26,26 @@ AMotionObject::AMotionObject()
 	else
 		SphereMesh = nullptr;
 
+	//Bezier
 	PointCount = 0;
-	Duration = 0.0f;
-	Timer = 0.0f;
 	PointLocations = TArray<FVector>();
-	Interpolate = false;
+	TimerBezier = 0.0f;
+	DurationBezier = 0.0f;
+	bInterpolateBezier = false;
+
+	//Rotation
+	BaseRotation = FRotator();
+	TargetRotation = FRotator();
+	TimerRotation = 0.0f;
+	DurationRotation = 0.0f;
+	bInterpolateRotation = false;
+
+	//Scale
+	BaseScale = FVector();
+	TargetScale = FVector();
+	TimerScale = 0.0f;
+	DurationScale = 0.0f;
+	bInterpolateScale = false;
 }
 
 void AMotionObject::BeginPlay()
@@ -71,21 +86,60 @@ void AMotionObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!Interpolate)
+	BezierInterpolation(DeltaTime);
+	RotationInterpolation(DeltaTime);
+	ScaleInterpolation(DeltaTime);
+}
+
+void AMotionObject::BezierInterpolation(const float& DeltaTime)
+{
+	//On vérifie si l'interpolation est lancée
+	if (!bInterpolateBezier)
 		return;
 
-	Timer += DeltaTime;
-	float Alpha = FMath::Clamp(Timer / Duration, 0, 1);
+	//On augmente le timer grace au delta time
+	TimerBezier += DeltaTime;
+	//On détermine l'alpha qui permet de faire l'interpolation par rapport au temps écoulé
+	float Alpha = FMath::Clamp(TimerBezier / DurationBezier, 0.0f, 1.0f);
 
+	//On effectue l'interpolation avec les points de bezier
 	FVector Location = UMyTools::BezierInterp(PointLocations, Alpha);
 
+	//On applique la location à l'objet
 	MeshComponent->SetWorldLocation(Location);
 }
 
-void AMotionObject::StartBezierInterpolation()
+void AMotionObject::RotationInterpolation(const float& DeltaTime)
 {
-	Interpolate = true;
-	Timer = 0.0f;
+	if (!bInterpolateRotation)
+		return;
+
+	TimerRotation += DeltaTime;
+	float Alpha = FMath::Clamp(TimerRotation / DurationRotation, 0.0f, 1.0f);
+
+	FRotator Rotation = FMath::Lerp(BaseRotation, TargetRotation, Alpha);
+
+	MeshComponent->SetWorldRotation(Rotation);
+}
+
+void AMotionObject::ScaleInterpolation(const float& DeltaTime)
+{
+	if (!bInterpolateScale)
+		return;
+
+	TimerScale += DeltaTime;
+	float Alpha = FMath::Clamp(TimerScale / DurationScale, 0.0f, 1.0f);
+
+	FVector Scale = FMath::Lerp(BaseScale, TargetScale, Alpha);
+
+	MeshComponent->SetWorldScale3D(Scale);
+}
+
+void AMotionObject::StartBezierInterpolation(float InterpDuration)
+{
+	bInterpolateBezier = true;
+	TimerBezier = 0.0f;
+	DurationBezier = InterpDuration;
 	
 	PointLocations = TArray<FVector>();
 
@@ -95,12 +149,22 @@ void AMotionObject::StartBezierInterpolation()
 	}
 }
 
-void AMotionObject::RotateTo(FVector Rotation, float Duration)
+void AMotionObject::RotateTo(FRotator Rotation, float InterpDuration)
 {
+	bInterpolateRotation = true;
+	BaseRotation = MeshComponent->GetComponentRotation();
+	TargetRotation = Rotation;
+	TimerRotation = 0.0f;
+	DurationRotation = InterpDuration;
 }
 
-void AMotionObject::ScaleTo(FVector Scale, float Duration)
+void AMotionObject::ScaleTo(FVector Scale, float InterpDuration)
 {
+	bInterpolateScale = true;
+	BaseScale = MeshComponent->GetComponentScale();
+	TargetScale = Scale;
+	TimerScale = 0.0f;
+	DurationScale = InterpDuration;
 }
 
 UStaticMeshComponent* AMotionObject::CreateBezierPoint(const int& Index)

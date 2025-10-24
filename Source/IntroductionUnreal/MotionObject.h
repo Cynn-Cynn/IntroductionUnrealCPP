@@ -20,14 +20,19 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void StartBezierInterpolation();
+private:
+	void BezierInterpolation(const float& DeltaTime);
+	void RotationInterpolation(const float& DeltaTime);
+	void ScaleInterpolation(const float& DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
-	void RotateTo(FVector Rotation, float Duration);
+	void StartBezierInterpolation(float InterpDuration);
 
 	UFUNCTION(BlueprintCallable)
-	void ScaleTo(FVector Scale, float Duration);
+	void RotateTo(FRotator Rotation, float InterpDuration);
+
+	UFUNCTION(BlueprintCallable)
+	void ScaleTo(FVector Scale, float InterpDuration);
 
 private:
 	UStaticMeshComponent* CreateBezierPoint(const int& Index);
@@ -39,9 +44,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Bezier")
 	USceneComponent* BezierPointList;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Bezier")
-	float Duration;
-
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Bezier")
 	int PointCount;
 
@@ -49,9 +51,23 @@ private:
 	TArray<UStaticMeshComponent*> BezierPoint;
 
 	USceneComponent* Root;
-	float Timer;
-	bool Interpolate;
-
 	UStaticMesh* SphereMesh;
+
+	float DurationBezier;
+	float DurationRotation;
+	float DurationScale;
+
+	float TimerBezier;
+	float TimerRotation;
+	float TimerScale;
+
+	bool bInterpolateBezier;
+	bool bInterpolateRotation;
+	bool bInterpolateScale;
+
 	TArray<FVector> PointLocations;
+	FRotator BaseRotation;
+	FRotator TargetRotation;
+	FVector BaseScale;
+	FVector TargetScale;
 };
