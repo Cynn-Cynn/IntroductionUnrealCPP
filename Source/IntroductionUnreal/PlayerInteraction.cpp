@@ -6,6 +6,8 @@ UPlayerInteraction::UPlayerInteraction()
 
 	DetectionRange = 0.0f;
 	Camera = nullptr;
+	InteractableActor = nullptr;
+	Hud = nullptr;
 }
 
 void UPlayerInteraction::BeginPlay()
@@ -13,6 +15,7 @@ void UPlayerInteraction::BeginPlay()
 	Super::BeginPlay();
 
 	Camera = GetOwner()->GetComponentByClass<UCameraComponent>();
+	Hud = Cast<AGameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
 }
 
 void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -20,6 +23,12 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	GetInteractableObject();
+}
+
+void UPlayerInteraction::UseInteractableActor()
+{
+	if (InteractableActor != nullptr)
+		IInteractable::Execute_Interact(InteractableActor);
 }
 
 void UPlayerInteraction::GetInteractableObject()
@@ -41,10 +50,35 @@ void UPlayerInteraction::GetInteractableObject()
 	//Paramètres supplémentaires, le dernier permet d'ignorer un acteur dans le calcul
 	const FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
 
+	//On effectue le line trace pour trouver un objet
 	if (World->LineTraceSingleByChannel(OUT Hit, Start, End, Channel, TraceParams))
 	{
-		AActor* InteractableActor = Hit.GetActor();
-		if (InteractableActor != nullptr && InteractableActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
-			IInteractable::Execute_Interact(InteractableActor);
+		//On récupère l'actor
+		AActor* HitActor = Hit.GetActor();
+		//On vérifie si c'est un objet interactif
+		//Si oui, on le stock
+		//Si non, on reset la variable qui stock l'actor
+		if (HitActor != nullptr && HitActor->Implements<UInteractable>())
+			SetInteractableObject(HitActor);
+		else
+			SetInteractableObject(nullptr);
 	}
+	else
+	{
+		//Si le line trace ne touche rien on reset la variable qui stock l'actor
+		SetInteractableObject(nullptr);
+	}
+}
+
+void UPlayerInteraction::SetInteractableObject(AActor* Interactable)
+{
+	if (Interactable == InteractableActor)
+		return;
+
+	InteractableActor = Interactable;
+
+	if (InteractableActor == nullptr)
+		Hud->SetInteractionDescription("");
+	else
+		Hud->SetInteractionDescription(IInteractable::Execute_GetDescription(InteractableActor));
 }

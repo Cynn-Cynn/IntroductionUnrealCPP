@@ -17,4 +17,6 @@ class INTRODUCTIONUNREAL_API IInteractable
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FString GetDescription();
 };
