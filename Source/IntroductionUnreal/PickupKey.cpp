@@ -3,6 +3,9 @@
 APickupKey::APickupKey()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetRootComponent(MeshComponent);
 }
 
 void APickupKey::Interact_Implementation()

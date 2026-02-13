@@ -31,6 +31,7 @@ void UFlagManager::SetFlag(FGameplayTag FlagName, int FlagValue)
 	}
 
 	Flags[FlagName].FlagValue = FlagValue;
+	OnFlagChanged.Broadcast();
 }
 
 void UFlagManager::IncrementFlag(FGameplayTag FlagName)
@@ -42,6 +43,7 @@ void UFlagManager::IncrementFlag(FGameplayTag FlagName)
 	}
 
 	Flags[FlagName].FlagValue += 1;
+	OnFlagChanged.Broadcast();
 }
 
 void UFlagManager::DecrementFlag(FGameplayTag FlagName)
@@ -53,7 +55,10 @@ void UFlagManager::DecrementFlag(FGameplayTag FlagName)
 	}
 
 	if (Flags[FlagName].FlagValue > 0)
+	{
 		Flags[FlagName].FlagValue -= 1;
+		OnFlagChanged.Broadcast();
+	}
 }
 
 void UFlagManager::FlipFlag(FGameplayTag FlagName)
@@ -65,11 +70,20 @@ void UFlagManager::FlipFlag(FGameplayTag FlagName)
 	}
 
 	if (Flags[FlagName].FlagValue == 0)
+	{
 		Flags[FlagName].FlagValue = 1;
+		OnFlagChanged.Broadcast();
+
+	}
 	else if (Flags[FlagName].FlagValue == 1)
+	{
 		Flags[FlagName].FlagValue = 0;
+		OnFlagChanged.Broadcast();
+	}
 	else
+	{
 		UE_LOG(LogTemp, Error, TEXT("Flip | Try to flip a non boolean flag: %s"), *FlagName.ToString());
+	}
 }
 
 void UFlagManager::ResetFlag(FGameplayTag FlagName)
@@ -81,6 +95,7 @@ void UFlagManager::ResetFlag(FGameplayTag FlagName)
 	}
 
 	Flags[FlagName].FlagValue = 0;
+	OnFlagChanged.Broadcast();
 }
 
 void UFlagManager::BeginPlay()

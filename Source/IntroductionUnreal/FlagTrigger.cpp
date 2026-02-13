@@ -17,6 +17,16 @@ void UFlagTrigger::BeginPlay()
 		return;
 
 	FlagManager = GameMode->GetComponentByClass<UFlagManager>();
+	if (FlagManager != nullptr)
+		FlagManager->OnFlagChanged.AddDynamic(this, &UFlagTrigger::CheckFlags);
+}
+
+void UFlagTrigger::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (FlagManager != nullptr)
+		FlagManager->OnFlagChanged.RemoveDynamic(this, &UFlagTrigger::CheckFlags);
 }
 
 bool UFlagTrigger::AreFlagsTriggered()
@@ -32,5 +42,11 @@ bool UFlagTrigger::AreFlagsTriggered()
 	}
 
 	return true;
+}
+
+void UFlagTrigger::CheckFlags()
+{
+	if (AreFlagsTriggered())
+		OnFlagChanged.Broadcast();
 }
 

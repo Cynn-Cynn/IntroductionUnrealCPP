@@ -72,9 +72,6 @@ void UPlayerInteraction::GetInteractableObject()
 
 void UPlayerInteraction::SetInteractableObject(AActor* Interactable)
 {
-	if (Interactable == InteractableActor)
-		return;
-
 	InteractableActor = Interactable;
 
 	if (InteractableActor == nullptr)

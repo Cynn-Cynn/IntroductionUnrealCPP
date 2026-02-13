@@ -9,5 +9,6 @@ void UInteractionWidget::NativeConstruct()
 
 void UInteractionWidget::SetText(FString Text)
 {
-	InteractionText->SetText(FText::FromString(Text));
+	if (Text != InteractionText->Text.ToString())
+		InteractionText->SetText(FText::FromString(Text));
 }

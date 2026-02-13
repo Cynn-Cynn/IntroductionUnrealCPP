@@ -25,4 +25,7 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	FGameplayTag Flag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual")
+	UStaticMeshComponent* MeshComponent;
 };

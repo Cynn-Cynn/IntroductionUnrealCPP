@@ -16,11 +16,20 @@ class INTRODUCTIONUNREAL_API UFlagTrigger : public UActorComponent
 public:	
 	UFlagTrigger();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool AreFlagsTriggered();
+
+private:
+	UFUNCTION()
+	void CheckFlags();
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FFlagValueChanged OnFlagChanged;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 private:
 	UPROPERTY(EditAnywhere)

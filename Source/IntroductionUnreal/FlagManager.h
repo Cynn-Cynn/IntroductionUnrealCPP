@@ -5,6 +5,7 @@
 #include "Flag.h"
 #include "FlagManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFlagValueChanged);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class INTRODUCTIONUNREAL_API UFlagManager : public UActorComponent
@@ -32,6 +33,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ResetFlag(FGameplayTag FlagName);
 
+public:
+	UPROPERTY(BlueprintAssignable)
+	FFlagValueChanged OnFlagChanged;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -40,4 +45,5 @@ private:
 	FGameplayTagContainer FlagNames;
 
 	TMap<FGameplayTag, FFlag> Flags;
+
 };
