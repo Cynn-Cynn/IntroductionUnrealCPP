@@ -25,7 +25,10 @@ private:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FFlagValueChanged OnFlagChanged;
+	FFlagValueChanged OnFlagValid;
+
+	UPROPERTY(BlueprintAssignable)
+	FFlagValueChanged OnFlagNotValid;
 
 protected:
 	virtual void BeginPlay() override;

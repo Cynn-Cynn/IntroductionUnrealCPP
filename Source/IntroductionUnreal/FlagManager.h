@@ -31,6 +31,9 @@ public:
 	void FlipFlag(FGameplayTag FlagName);
 
 	UFUNCTION(BlueprintCallable)
+	void FlipBitFlag(FGameplayTag FlagName, int Index);
+
+	UFUNCTION(BlueprintCallable)
 	void ResetFlag(FGameplayTag FlagName);
 
 public:
@@ -44,6 +47,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	FGameplayTagContainer FlagNames;
 
-	TMap<FGameplayTag, FFlag> Flags;
+	TMap<FGameplayTag, int> Flags;
 
 };

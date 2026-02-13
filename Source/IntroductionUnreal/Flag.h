@@ -14,4 +14,8 @@ public:
 	FGameplayTag FlagName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int FlagValue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsExact;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsBitFlag;
 };

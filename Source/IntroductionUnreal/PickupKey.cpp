@@ -6,6 +6,8 @@ APickupKey::APickupKey()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	SetRootComponent(MeshComponent);
+
+	FlagIndex = 0;
 }
 
 void APickupKey::Interact_Implementation()
@@ -19,7 +21,7 @@ void APickupKey::Interact_Implementation()
 	if (FlagManager == nullptr)
 		return;
 
-	FlagManager->IncrementFlag(Flag);
+	FlagManager->FlipBitFlag(Flag, FlagIndex);
 	Destroy();
 }
 

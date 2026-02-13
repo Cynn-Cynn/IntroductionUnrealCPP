@@ -37,8 +37,18 @@ bool UFlagTrigger::AreFlagsTriggered()
 	for (FFlag Flag : Flags)
 	{
 		int FlagValue = FlagManager->GetFlagValue(Flag.FlagName);
-		if (FlagValue == -1 || FlagValue != Flag.FlagValue)
+
+		if (Flag.IsBitFlag)
+		{
+			int Bit = 1;
+			Bit = Bit << Flag.FlagValue;
+			if ((FlagValue & Bit) != Bit)
+				return false;
+		}
+		else if (FlagValue == -1 || (FlagValue != Flag.FlagValue && Flag.IsExact) || (FlagValue < Flag.FlagValue && !Flag.IsExact))
+		{
 			return false;
+		}
 	}
 
 	return true;
@@ -47,6 +57,8 @@ bool UFlagTrigger::AreFlagsTriggered()
 void UFlagTrigger::CheckFlags()
 {
 	if (AreFlagsTriggered())
-		OnFlagChanged.Broadcast();
+		OnFlagValid.Broadcast();
+	else
+		OnFlagNotValid.Broadcast();
 }
 
