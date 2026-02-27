@@ -14,7 +14,7 @@ AIntroductionUnrealCharacter::AIntroductionUnrealCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-	
+
 	// Create the first person mesh that will be viewed only by this character's owner
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("First Person Mesh"));
 
@@ -42,10 +42,12 @@ AIntroductionUnrealCharacter::AIntroductionUnrealCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+
+	bCanMove = true;
 }
 
 void AIntroductionUnrealCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{	
+{
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
@@ -73,7 +75,8 @@ void AIntroductionUnrealCharacter::MoveInput(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	// pass the axis values to the move input
-	DoMove(MovementVector.X, MovementVector.Y);
+	if (bCanMove)
+		DoMove(MovementVector.X, MovementVector.Y);
 
 }
 
@@ -83,7 +86,8 @@ void AIntroductionUnrealCharacter::LookInput(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	// pass the axis values to the aim input
-	DoAim(LookAxisVector.X, LookAxisVector.Y);
+	if (bCanMove)
+		DoAim(LookAxisVector.X, LookAxisVector.Y);
 
 }
 
@@ -110,7 +114,8 @@ void AIntroductionUnrealCharacter::DoMove(float Right, float Forward)
 void AIntroductionUnrealCharacter::DoJumpStart()
 {
 	// pass Jump to the character
-	Jump();
+	if (bCanMove)
+		Jump();
 }
 
 void AIntroductionUnrealCharacter::DoJumpEnd()

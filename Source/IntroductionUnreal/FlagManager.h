@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Flag.h"
+#include "LevelFlagsSave.h"
+#include <Kismet/GameplayStatics.h>
 #include "FlagManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFlagValueChanged);
@@ -35,6 +37,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetFlag(FGameplayTag FlagName);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadLevelFlags(int LevelIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void SaveLevelFlags(int LevelIndex);
 
 public:
 	UPROPERTY(BlueprintAssignable)

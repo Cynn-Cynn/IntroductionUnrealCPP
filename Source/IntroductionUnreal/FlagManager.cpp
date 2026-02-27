@@ -117,6 +117,30 @@ void UFlagManager::ResetFlag(FGameplayTag FlagName)
 	OnFlagChanged.Broadcast();
 }
 
+void UFlagManager::LoadLevelFlags(int LevelIndex)
+{
+
+}
+
+void UFlagManager::SaveLevelFlags(int LevelIndex)
+{
+	ULevelFlagsSave* Save = Cast<ULevelFlagsSave>(UGameplayStatics::CreateSaveGameObject(ULevelFlagsSave::StaticClass()));
+
+	TArray<FGameplayTag> FlagsArray;
+	Flags.GetKeys(FlagsArray);
+	for (FGameplayTag Flag : FlagsArray)
+	{
+		if (Flag.ToString().Contains("Level"))
+		{
+			FString FlagSave = Flag.ToString().Append(":").Append(FString::FromInt(Flags[Flag]));
+			Save->Flags.Add(FlagSave);
+		}
+	}
+
+	FString LevelName = FString("LevelSave").Append(":").Append(FString::FromInt(LevelIndex));
+	UGameplayStatics::SaveGameToSlot(Save, LevelName, 0);
+}
+
 void UFlagManager::BeginPlay()
 {
 	Super::BeginPlay();
