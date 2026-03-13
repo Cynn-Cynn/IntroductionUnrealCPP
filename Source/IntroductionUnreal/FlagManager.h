@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "Flag.h"
 #include "LevelFlagsSave.h"
+#include "PlayerValuesSave.h"
 #include <Kismet/GameplayStatics.h>
 #include "FlagManager.generated.h"
 
@@ -42,7 +43,13 @@ public:
 	void LoadLevelFlags(int LevelIndex);
 
 	UFUNCTION(BlueprintCallable)
-	void SaveLevelFlags(int LevelIndex);
+	void SaveLevelFlags();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadPlayerFlags();
+
+	UFUNCTION(BlueprintCallable)
+	void SavePlayerFlags();
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -57,4 +64,7 @@ private:
 
 	TMap<FGameplayTag, int> Flags;
 
+	const FString LEVEL_SAVE = "LevelSave_";
+	const FString PLAYER_SAVE = "PlayerSave";
+	FGameplayTag LevelIndexTag;
 };

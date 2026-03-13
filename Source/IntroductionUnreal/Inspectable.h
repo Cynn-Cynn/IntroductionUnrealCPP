@@ -20,13 +20,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RotateInspectable(FVector2D MouseDelta);
 
-protected:
-	virtual void BeginPlay() override;
+private:
+	void StartInspection();
+	void EndInspection();
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DistanceFromCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RotationSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float InterpSpeed;
+
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool IsInspected;
+
+	FRotator CameraRotation;
+
+	FVector InitialLocation;
+	FRotator InitialRotation;
+
+	FVector2D MouseInput;
 };

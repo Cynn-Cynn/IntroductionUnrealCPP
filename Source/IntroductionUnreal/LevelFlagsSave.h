@@ -11,5 +11,7 @@ class INTRODUCTIONUNREAL_API ULevelFlagsSave : public USaveGame
 	
 public:
 	UPROPERTY()
-	TArray<FString> Flags;
+	TArray<FString> FlagNames;
+	UPROPERTY()
+	TArray<int> FlagValues;
 };

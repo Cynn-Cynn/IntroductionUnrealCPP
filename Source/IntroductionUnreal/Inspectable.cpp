@@ -12,9 +12,44 @@ AInspectable::AInspectable()
 		Mesh->SetStaticMesh(cubeMesh.Object);
 
 	DistanceFromCamera = 100.0f;
+	InterpSpeed = 0.5f;
+	RotationSpeed = 180.0f;
+	CameraRotation = FRotator();
+	IsInspected = false;
+	InitialLocation = FVector();
+	InitialRotation = FRotator();
+	MouseInput = FVector2D();
 }
 
 void AInspectable::Interact_Implementation()
+{
+	if (IsInspected)
+		EndInspection();
+	else
+		StartInspection();
+}
+
+FString AInspectable::GetDescription_Implementation()
+{
+	return IsInspected ? FString("") : FString("Inspect");
+}
+
+void AInspectable::RotateInspectable(FVector2D MouseDelta)
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	float DeltaTime = World->GetDeltaSeconds();
+
+	MouseInput = FMath::Vector2DInterpTo(MouseInput, MouseDelta, DeltaTime, InterpSpeed);
+
+	FVector VerticalRotation = CameraRotation.RotateVector(FVector(MouseInput.Y, 0.0f, 0.0f));
+	FRotator RotationToAdd = FRotator(VerticalRotation.X, -MouseInput.X, -VerticalRotation.Y) * RotationSpeed * DeltaTime;
+	AddActorWorldRotation(RotationToAdd);
+}
+
+void AInspectable::StartInspection()
 {
 	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
 	if (Controller == nullptr)
@@ -28,25 +63,34 @@ void AInspectable::Interact_Implementation()
 	if (CameraManager == nullptr)
 		return;
 
+	InitialLocation = GetActorLocation();
+	InitialRotation = GetActorRotation();
+
 	FVector CameraLocation = CameraManager->GetCameraLocation();
-	FRotator CameraRotation = CameraManager->GetCameraRotation();
+	CameraRotation = CameraManager->GetCameraRotation();
 
 	FVector InspectLocation = CameraLocation + CameraRotation.RotateVector(FVector::ForwardVector) * DistanceFromCamera;
 
 	SetActorLocation(InspectLocation);
+
+	CameraRotation.Pitch = 0.0f;
+	CameraRotation.Roll = 0.0f;
+	IsInspected = true;
 }
 
-FString AInspectable::GetDescription_Implementation()
+void AInspectable::EndInspection()
 {
-	return FString("Inspect");
-}
+	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+	if (Controller == nullptr)
+		return;
 
-void AInspectable::RotateInspectable(FVector2D MouseDelta)
-{
-}
+	AIntroductionUnrealCharacter* Character = Cast<AIntroductionUnrealCharacter>(Controller->GetCharacter());
+	if (Character != nullptr)
+		Character->bCanMove = true;
 
-void AInspectable::BeginPlay()
-{
-	Super::BeginPlay();
+	SetActorLocation(InitialLocation);
+	SetActorRotation(InitialRotation);
+
+	IsInspected = false;
 }
 

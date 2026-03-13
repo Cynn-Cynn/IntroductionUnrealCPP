@@ -119,26 +119,74 @@ void UFlagManager::ResetFlag(FGameplayTag FlagName)
 
 void UFlagManager::LoadLevelFlags(int LevelIndex)
 {
+	FString LevelName = FString(LEVEL_SAVE).Append(FString::FromInt(LevelIndex));
+	ULevelFlagsSave* Save = Cast<ULevelFlagsSave>(UGameplayStatics::LoadGameFromSlot(LevelName, 0));
 
+	if (Save == nullptr)
+		return;
+
+	for (int i = 0; i < Save->FlagNames.Num(); i++)
+	{
+		FGameplayTag FlagName = FGameplayTag::RequestGameplayTag(FName(Save->FlagNames[i]), false);
+		SetFlag(FlagName, Save->FlagValues[i]);
+	}
+
+	SetFlag(LevelIndexTag, LevelIndex);
 }
 
-void UFlagManager::SaveLevelFlags(int LevelIndex)
+void UFlagManager::SaveLevelFlags()
 {
+	int LevelIndex = GetFlagValue(LevelIndexTag);
+
 	ULevelFlagsSave* Save = Cast<ULevelFlagsSave>(UGameplayStatics::CreateSaveGameObject(ULevelFlagsSave::StaticClass()));
 
 	TArray<FGameplayTag> FlagsArray;
 	Flags.GetKeys(FlagsArray);
 	for (FGameplayTag Flag : FlagsArray)
 	{
-		if (Flag.ToString().Contains("Level"))
+		if (Flag.ToString().Contains("Level."))
 		{
-			FString FlagSave = Flag.ToString().Append(":").Append(FString::FromInt(Flags[Flag]));
-			Save->Flags.Add(FlagSave);
+			Save->FlagNames.Add(Flag.ToString());
+			Save->FlagValues.Add(Flags[Flag]);
 		}
 	}
 
-	FString LevelName = FString("LevelSave").Append(":").Append(FString::FromInt(LevelIndex));
+	FString LevelName = FString(LEVEL_SAVE).Append(FString::FromInt(LevelIndex));
 	UGameplayStatics::SaveGameToSlot(Save, LevelName, 0);
+}
+
+void UFlagManager::LoadPlayerFlags()
+{
+	UPlayerValuesSave* Save = Cast<UPlayerValuesSave>(UGameplayStatics::LoadGameFromSlot(PLAYER_SAVE, 0));
+
+	if (Save == nullptr)
+		return;
+
+	SetFlag(LevelIndexTag, Save->LevelIndex);
+
+	LoadLevelFlags(Save->LevelIndex);
+}
+
+void UFlagManager::SavePlayerFlags()
+{
+	UPlayerValuesSave* Save = Cast<UPlayerValuesSave>(UGameplayStatics::CreateSaveGameObject(UPlayerValuesSave::StaticClass()));
+
+	TArray<FGameplayTag> FlagsArray;
+	Flags.GetKeys(FlagsArray);
+	for (FGameplayTag Flag : FlagsArray)
+	{
+		if (Flag.ToString().Contains("Player."))
+		{
+			if (Flag.ToString().Contains("LevelIndex"))
+			{
+				Save->LevelIndex = GetFlagValue(Flag);
+			}
+
+			//Other player variables
+		}
+	}
+
+	UGameplayStatics::SaveGameToSlot(Save, PLAYER_SAVE, 0);
 }
 
 void UFlagManager::BeginPlay()
@@ -149,5 +197,7 @@ void UFlagManager::BeginPlay()
 	{
 		Flags.Add(Tag, 0);
 	}
+
+	LevelIndexTag = FGameplayTag::RequestGameplayTag("Player.LevelIndex");
 }
 
