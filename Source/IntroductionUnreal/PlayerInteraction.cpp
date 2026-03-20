@@ -5,7 +5,7 @@ UPlayerInteraction::UPlayerInteraction()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	DetectionRange = 0.0f;
-	Camera = nullptr;
+	//Camera = nullptr;
 	InteractableActor = nullptr;
 	Hud = nullptr;
 }
@@ -14,7 +14,7 @@ void UPlayerInteraction::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Camera = GetOwner()->GetComponentByClass<UCameraComponent>();
+	//Camera = GetOwner()->GetComponentByClass<UCameraComponent>();
 	Hud = Cast<AGameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetHUD());
 }
 
@@ -33,8 +33,8 @@ void UPlayerInteraction::UseInteractableActor()
 
 void UPlayerInteraction::GetInteractableObject()
 {
-	if (Camera == nullptr)
-		return;
+	//if (Camera == nullptr)
+	//	return;
 
 	UWorld* World = GetWorld();
 	if (World == nullptr)
@@ -43,8 +43,12 @@ void UPlayerInteraction::GetInteractableObject()
 	//Resultat
 	FHitResult Hit;
 	//Points de départ et d'arrivée du line trace
-	FVector Start = Camera->GetComponentLocation();
-	FVector End = Start + Camera->GetForwardVector() * DetectionRange;
+	//FVector Start = Camera->GetComponentLocation();
+	//FVector End = Start + Camera->GetForwardVector() * DetectionRange;
+	
+	FVector Start = GetOwner()->GetActorLocation();
+	FVector End = Start + GetOwner()->GetActorForwardVector() * DetectionRange;
+
 	//Channel sur lequel on effectue le line trace
 	ECollisionChannel Channel(ECC_GameTraceChannel1);
 	//Paramètres supplémentaires, le dernier permet d'ignorer un acteur dans le calcul

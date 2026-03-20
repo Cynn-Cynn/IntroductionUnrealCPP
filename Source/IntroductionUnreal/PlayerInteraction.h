@@ -34,7 +34,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DetectionRange;
 
-	UCameraComponent* Camera;
+	//UCameraComponent* Camera;
 
 	AActor* InteractableActor;
 

@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include <Camera/CameraComponent.h>
 #include "EnhancedInputComponent.h"
+#include "PlayerInteraction.h"
 #include "TopViewCharacter.generated.h"
 
 UCLASS()
@@ -23,11 +25,22 @@ public:
 
 private:
 	void MoveInput(const FInputActionValue& Value);
+	void InteractInput(const FInputActionValue& _);
+	//void CameraInput(const FInputActionValue& Value);
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* MainCamera;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//UCameraComponent* MainCamera;
+
+	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	//UInputAction* MouseAction;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	UPlayerInteraction* PlayerInteraction;
 };

@@ -4,13 +4,17 @@ ATopViewCharacter::ATopViewCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Main Camera"));
-	MainCamera->SetupAttachment(GetMesh());
+	PlayerInteraction = CreateDefaultSubobject<UPlayerInteraction>(TEXT("Player Interaction"));
+
+	//MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Main Camera"));
+	//MainCamera->SetupAttachment(GetMesh());
 
 	//GetCapsuleComponent();
 	//GetCharacterMovement();
 
 	MoveAction = nullptr;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void ATopViewCharacter::BeginPlay()
@@ -34,12 +38,37 @@ void ATopViewCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		return;
 
 	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATopViewCharacter::MoveInput);
+	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ATopViewCharacter::InteractInput);
+	//EnhancedInput->BindAction(MouseAction, ETriggerEvent::Triggered , this, &ATopViewCharacter::CameraInput);
 }
 
 void ATopViewCharacter::MoveInput(const FInputActionValue& Value)
 {
 	FVector2D Input = Value.Get<FVector2D>();
 
-	AddMovementInput(GetActorForwardVector(), Input.Y);
-	AddMovementInput(GetActorRightVector(), Input.X);
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	TObjectPtr<APlayerCameraManager> CameraManager = PlayerController->PlayerCameraManager;
+	if (CameraManager == nullptr)
+		return;
+
+	FRotator CameraRotation = CameraManager->GetCameraRotation();
+	CameraRotation.Pitch = 0.0f;
+	CameraRotation.Roll = 0.0f;
+
+	AddMovementInput(CameraRotation.RotateVector(FVector::ForwardVector), Input.Y);
+	AddMovementInput(CameraRotation.RotateVector(FVector::RightVector), Input.X);
 }
+
+void ATopViewCharacter::InteractInput(const FInputActionValue& _)
+{
+	PlayerInteraction->UseInteractableActor();
+}
+
+//void ATopViewCharacter::CameraInput(const FInputActionValue& Value)
+//{
+//	FVector2D Input = Value.Get<FVector2D>();
+//
+//	AddControllerYawInput(Input.X);
+//	AddControllerPitchInput(Input.Y);
+//}
