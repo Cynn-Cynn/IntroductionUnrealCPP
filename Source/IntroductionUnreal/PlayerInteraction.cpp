@@ -23,6 +23,9 @@ void UPlayerInteraction::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	GetInteractableObject();
+
+	if (InteractableActor != nullptr)
+		FaceWidgetToCamera();
 }
 
 void UPlayerInteraction::UseInteractableActor()
@@ -76,10 +79,34 @@ void UPlayerInteraction::GetInteractableObject()
 
 void UPlayerInteraction::SetInteractableObject(AActor* Interactable)
 {
+	if (Interactable != nullptr && InteractableActor == nullptr)
+	{
+		IInteractable::Execute_ShowDescription(Interactable, true);
+	}
+	else if (Interactable == nullptr && InteractableActor != nullptr)
+	{
+		IInteractable::Execute_ShowDescription(InteractableActor, false);
+	}
+
 	InteractableActor = Interactable;
 
-	if (InteractableActor == nullptr)
-		Hud->SetInteractionDescription("");
-	else
-		Hud->SetInteractionDescription(IInteractable::Execute_GetDescription(InteractableActor));
+	//if (InteractableActor == nullptr)
+	//	Hud->SetInteractionDescription("");
+	//else
+	//	Hud->SetInteractionDescription(IInteractable::Execute_GetDescription(InteractableActor));
+}
+
+void UPlayerInteraction::FaceWidgetToCamera()
+{
+	APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+	if (Controller == nullptr)
+		return;
+
+	TObjectPtr<APlayerCameraManager> CameraManager = Controller->PlayerCameraManager;
+	if (CameraManager == nullptr)
+		return;
+
+	FRotator CameraRotation = CameraManager->GetCameraRotation();
+	FRotator WidgetRotation = CameraRotation.GetInverse();
+	IInteractable::Execute_SetWidgetRotation(InteractableActor, CameraRotation);
 }

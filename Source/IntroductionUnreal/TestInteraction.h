@@ -19,6 +19,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetDescription_Implementation() override;
 
+	UFUNCTION(BlueprintCallable)
+	void ShowDescription_Implementation(bool Value) override;
+	UFUNCTION(BlueprintCallable)
+	void SetWidgetRotation_Implementation(FRotator Rotation) override;
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Visual")
 	UStaticMeshComponent* MeshComponent;

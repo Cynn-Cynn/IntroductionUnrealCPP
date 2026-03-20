@@ -19,4 +19,8 @@ public:
 	void Interact();
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FString GetDescription();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowDescription(bool Value);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetWidgetRotation(FRotator Rotation);
 };

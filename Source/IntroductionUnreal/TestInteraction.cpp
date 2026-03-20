@@ -22,3 +22,11 @@ FString ATestInteraction::GetDescription_Implementation()
 	return FString("Rotate");
 }
 
+void ATestInteraction::ShowDescription_Implementation(bool Value)
+{
+}
+
+void ATestInteraction::SetWidgetRotation_Implementation(FRotator Rotation)
+{
+}
+

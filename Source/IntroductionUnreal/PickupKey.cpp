@@ -30,3 +30,11 @@ FString APickupKey::GetDescription_Implementation()
 	return FString("Pickup");
 }
 
+void APickupKey::ShowDescription_Implementation(bool Value)
+{
+}
+
+void APickupKey::SetWidgetRotation_Implementation(FRotator Rotation)
+{
+}
+

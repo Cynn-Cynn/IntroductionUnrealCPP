@@ -11,6 +11,9 @@ AInspectable::AInspectable()
 	if (cubeMesh.Succeeded())
 		Mesh->SetStaticMesh(cubeMesh.Object);
 
+	DescriptiondWidget = CreateDefaultSubobject<UWidgetComponent>("Description");
+	DescriptiondWidget->SetupAttachment(RootComponent);
+
 	DistanceFromCamera = 100.0f;
 	InterpSpeed = 0.5f;
 	RotationSpeed = 180.0f;
@@ -19,6 +22,9 @@ AInspectable::AInspectable()
 	InitialLocation = FVector();
 	InitialRotation = FRotator();
 	MouseInput = FVector2D();
+
+	InteractionWidget = nullptr;
+	DescriptionText = "Interact";
 }
 
 void AInspectable::Interact_Implementation()
@@ -34,6 +40,17 @@ FString AInspectable::GetDescription_Implementation()
 	return IsInspected ? FString("") : FString("Inspect");
 }
 
+void AInspectable::ShowDescription_Implementation(bool Value)
+{
+	InteractionWidget->SetText(Value ? DescriptionText : "");
+}
+
+void AInspectable::SetWidgetRotation_Implementation(FRotator Rotation)
+{
+	DescriptiondWidget->SetWorldRotation(Rotation);
+	DescriptiondWidget->AddLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
+}
+
 void AInspectable::RotateInspectable(FVector2D MouseDelta)
 {
 	UWorld* World = GetWorld();
@@ -47,6 +64,14 @@ void AInspectable::RotateInspectable(FVector2D MouseDelta)
 	FVector VerticalRotation = CameraRotation.RotateVector(FVector(MouseInput.Y, 0.0f, 0.0f));
 	FRotator RotationToAdd = FRotator(VerticalRotation.X, -MouseInput.X, -VerticalRotation.Y) * RotationSpeed * DeltaTime;
 	AddActorWorldRotation(RotationToAdd);
+}
+
+void AInspectable::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InteractionWidget = Cast<UInteractionWidget>(DescriptiondWidget->GetWidget());
+	InteractionWidget->SetText("");
 }
 
 void AInspectable::StartInspection()
